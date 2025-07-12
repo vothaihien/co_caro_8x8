@@ -1,6 +1,7 @@
 import 'package:co_caro/providers/game_provider.dart';
 import 'package:co_caro/screens/home_screen.dart';
 import 'package:co_caro/services/api_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,11 +12,12 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final dio = Dio();
   final apiService = ApiService(dio);
+  final connectivity = Connectivity();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => GameProvider(prefs, apiService),
+          create: (_) => GameProvider(prefs, apiService, connectivity),
         ),
       ],
       child: const MyApp(),

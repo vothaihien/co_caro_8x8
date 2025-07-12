@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/ai_move_request.dart';
@@ -7,6 +9,7 @@ import '../services/api_service.dart';
 class GameProvider with ChangeNotifier {
   final SharedPreferences _prefs;
   final ApiService _apiService;
+  final Connectivity _connectivity;
   List<List<String>> board = List.generate(8, (_) => List.generate(8, (_) => ''));
   List<Map<String, int>> playerMoves = [];
   List<Map<String, int>> cpuMoves = [];
@@ -14,9 +17,12 @@ class GameProvider with ChangeNotifier {
   bool isLoading = false;
   String? lastMove;
   String gameStatus = 'Player X\'s turn';
+  String? networkMessage;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
-  GameProvider(this._prefs, this._apiService) {
+  GameProvider(this._prefs, this._apiService, this._connectivity) {
     _loadGame();
+    _initConnectivity();
   }
 
   void _loadGame() {
@@ -36,6 +42,29 @@ class GameProvider with ChangeNotifier {
       gameStatus = data['gameStatus'];
       notifyListeners();
     }
+  }
+
+  void _initConnectivity() {
+    // Lắng nghe sự thay đổi của trạng thái mạng.
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) {
+      if(result.contains(ConnectivityResult.none) && result.length == 1) {
+        networkMessage = "No internet connection. Please check your network.";
+      } else {
+        networkMessage = "Internet connection restored.";
+      }
+      notifyListeners();
+      // Xóa thông báo sau 3 giây.
+      _removeAfter3s();
+    });
+  }
+
+  Future<void> _removeAfter3s() {
+    return Future.delayed(const Duration(seconds: 3), () {
+      if(networkMessage != null) {
+        networkMessage = null;
+        notifyListeners();
+      }
+    });
   }
 
   void _saveGame() {
@@ -91,6 +120,25 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      // Kiểm tra kết nối trước khi gọi API.
+      final connectivityResult = await _connectivity.checkConnectivity();
+      if(connectivityResult.contains(ConnectivityResult.none) && connectivityResult.length == 1) {
+        networkMessage = "No internet connection. Please check your network.";
+        gameStatus = "Player X\'s turn";
+        isPlayerTurn = true;
+        isLoading = false;
+        notifyListeners();
+        // Xóa thông báo sau 3 giây.
+        // Future.delayed(Duration(seconds: 3), () {
+        //   if (networkMessage != null) {
+        //     networkMessage = null;
+        //     notifyListeners();
+        //   }
+        // });
+        _removeAfter3s();
+        return;
+      }
+
       final response = await _apiService.getAiMove(
         AiMoveRequest(
           board: [8, 8],
@@ -179,6 +227,12 @@ class GameProvider with ChangeNotifier {
 
   void _showResultDialog() {
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
   }
 }
 

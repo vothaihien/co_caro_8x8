@@ -21,7 +21,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<GameProvider>(
         builder: (context, gameProvider, child) {
-          if (gameProvider.gameStatus.contains('wins') ||
+          // Hiển thị thông báo khi không có mạng.
+          if (gameProvider.networkMessage != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(gameProvider.networkMessage!),
+                  duration: const Duration(seconds: 3),
+                  backgroundColor: gameProvider.networkMessage!.contains("restored")
+                  ? Colors.green
+                  : Colors.red,
+                )
+              );
+            });
+          }
+          // Hiển thị thông báo thắng/thua/hòa.
+          if (gameProvider.gameStatus.contains('Wins') ||
               gameProvider.gameStatus.contains('Draw')) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               showDialog(
