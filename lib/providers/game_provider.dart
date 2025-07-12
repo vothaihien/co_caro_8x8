@@ -128,13 +128,6 @@ class GameProvider with ChangeNotifier {
         isPlayerTurn = true;
         isLoading = false;
         notifyListeners();
-        // Xóa thông báo sau 3 giây.
-        // Future.delayed(Duration(seconds: 3), () {
-        //   if (networkMessage != null) {
-        //     networkMessage = null;
-        //     notifyListeners();
-        //   }
-        // });
         _removeAfter3s();
         return;
       }
