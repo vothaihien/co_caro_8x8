@@ -83,9 +83,10 @@ Caro 8x8 is a Flutter-based mobile application implementing the classic Tic-Tac-
 caro_game/
 ├── lib/
 │   ├── main.dart              # App entry point, sets up MultiProvider
-│   ├── api_service.dart       # Defines REST API client using Retrofit
-│   ├── game_provider.dart     # Manages game state, API calls, and network status
-│   ├── home_screen.dart       # Renders the game UI (board, status, dialog, SnackBar)
-├── pubspec.yaml              # Dependencies and project configuration
-├── README.md                 # Project documentation
+│   ├── models/                # Catch data call from API
+│   ├── services/              # Defines REST API client using Retrofit
+│   ├── providers              # Manages game state, API calls, and network status
+│   ├── screens                # Renders the game UI (board, status, dialog, SnackBar)
+├── pubspec.yaml               # Dependencies and project configuration
+├── README.md                  # Project documentation
 ```
