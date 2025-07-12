@@ -85,8 +85,8 @@ caro_game/
 │   ├── main.dart              # App entry point, sets up MultiProvider
 │   ├── models/                # Catch data call from API
 │   ├── services/              # Defines REST API client using Retrofit
-│   ├── providers              # Manages game state, API calls, and network status
-│   ├── screens                # Renders the game UI (board, status, dialog, SnackBar)
+│   ├── providers/             # Manages game state, API calls, and network status
+│   ├── screens/               # Renders the game UI (board, status, dialog, SnackBar)
 ├── pubspec.yaml               # Dependencies and project configuration
 ├── README.md                  # Project documentation
 ```
